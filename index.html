@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 4: Medición de Presión - Universidad de América</title>
+    
+    <!-- Tailwind CSS para diseño moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuración de MathJax para renderizar ecuaciones LaTeX -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Estilos Personalizados -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Roboto:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Merriweather', serif;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-btn.active {
+            background-color: #1e3a8a; /* blue-900 */
+            color: white;
+            border-bottom: 2px solid #60a5fa; /* blue-400 */
+        }
+
+        .math-box {
+            background-color: #f8fafc;
+            border-left: 4px solid #1d4ed8;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+
+        /* Efecto hover suave para las imágenes */
+        .img-hover-zoom {
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+        .img-hover-zoom img {
+            transition: transform 0.5s ease;
+        }
+        .img-hover-zoom:hover img {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen">
+
+    <!-- ENCABEZADO INSTITUCIONAL -->
+    <header class="bg-blue-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <!-- Icono SVG de Libro/Universidad -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">UNIVERSIDAD DE AMÉRICA</h1>
+                    <p class="text-xs text-blue-200 uppercase tracking-widest">Facultad de Ingeniería - Mecánica de Fluidos</p>
+                </div>
+            </div>
+            <div class="mt-4 md:mt-0 text-right hidden md:block">
+                <p class="text-sm font-light">Prof. Juan Sandoval Herrera</p>
+                <p class="text-xs opacity-70">Basado en Guía 4 y Mott (Cap. 3)</p>
+            </div>
+        </div>
+
+        <!-- BARRA DE NAVEGACIÓN (TABS) -->
+        <nav class="bg-blue-800 text-sm overflow-x-auto">
+            <div class="container mx-auto flex">
+                <button onclick="openTab('portada')" class="nav-btn active px-6 py-3 font-medium hover:bg-blue-700 transition-colors whitespace-nowrap">Portada</button>
+                <button onclick="openTab('introduccion')" class="nav-btn px-6 py-3 font-medium hover:bg-blue-700 transition-colors whitespace-nowrap">Introducción</button>
+                <button onclick="openTab('teoria')" class="nav-btn px-6 py-3 font-medium hover:bg-blue-700 transition-colors whitespace-nowrap">Fundamentos</button>
+                <button onclick="openTab('aplicaciones')" class="nav-btn px-6 py-3 font-medium hover:bg-blue-700 transition-colors whitespace-nowrap">Aplicaciones</button>
+                <button onclick="openTab('ejemplos')" class="nav-btn px-6 py-3 font-medium hover:bg-blue-700 transition-colors whitespace-nowrap">Ejemplos (5)</button>
+                <button onclick="openTab('ejercicios')" class="nav-btn px-6 py-3 font-medium hover:bg-blue-700 transition-colors whitespace-nowrap">Ejercicios Propuestos</button>
+                <button onclick="openTab('bibliografia')" class="nav-btn px-6 py-3 font-medium hover:bg-blue-700 transition-colors whitespace-nowrap">Bibliografía</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container mx-auto px-4 py-8 flex-grow max-w-5xl">
+
+        <!-- 1. SECCIÓN PORTADA -->
+        <div id="portada" class="tab-content active">
+            <div class="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl shadow-sm border border-slate-200">
+                <div class="w-24 h-1 bg-blue-600 mb-8 rounded-full"></div>
+                <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">Estática de Fluidos</h2>
+                <h3 class="text-2xl text-slate-600 font-light mb-8">Unidad 4: Medición de la Presión</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl px-4 mt-8">
+                    <div class="p-6 bg-slate-50 rounded-xl border hover:border-blue-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 mb-3 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+                        <h4 class="font-bold mb-2">Objetivo</h4>
+                        <p class="text-sm text-slate-600">Comprender la variación de la presión con la profundidad y sus instrumentos de medición.</p>
+                    </div>
+                    <div class="p-6 bg-slate-50 rounded-xl border hover:border-blue-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 mb-3 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                        <h4 class="font-bold mb-2">Herramientas</h4>
+                        <p class="text-sm text-slate-600">Uso de Manómetros en U, Barómetros y Transductores piezoeléctricos.</p>
+                    </div>
+                    <div class="p-6 bg-slate-50 rounded-xl border hover:border-blue-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 mb-3 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                        <h4 class="font-bold mb-2">Referencias</h4>
+                        <p class="text-sm text-slate-600">Robert Mott (7a Ed.) y Apuntes de Clase Dr. Sandoval.</p>
+                    </div>
+                </div>
+
+                <button onclick="openTab('introduccion')" class="mt-12 bg-blue-900 text-white px-8 py-3 rounded-full hover:bg-blue-800 transition shadow-lg flex items-center gap-2">
+                    Iniciar Módulo <span class="text-xl">&rarr;</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. SECCIÓN INTRODUCCIÓN -->
+        <div id="introduccion" class="tab-content">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-3xl font-bold text-blue-900 mb-6">Introducción y Definiciones</h2>
+                <p class="text-lg text-slate-700 leading-relaxed mb-6">
+                    De acuerdo con el Capítulo 3 de <em>Mecánica de Fluidos</em> de Mott, la presión se define como la cantidad de fuerza ejercida sobre una unidad de área de una sustancia. En la estática de fluidos, estudiamos los fluidos que están en reposo o moviéndose como un cuerpo rígido, donde no existen esfuerzos cortantes.
+                </p>
+                
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="font-bold text-xl mb-3">La Presión (P)</h3>
+                        <div class="math-box">
+                            $$ P = \frac{F}{A} $$
+                        </div>
+                        <ul class="list-disc pl-5 space-y-2 text-slate-600">
+                            <li><strong>Sistema Internacional (SI):</strong> Pascal (Pa) = $N/m^2$. Comúnmente kPa.</li>
+                            <li><strong>Sistema Británico:</strong> psi ($lb/in^2$) o psf ($lb/ft^2$).</li>
+                        </ul>
+                        <div class="mt-6">
+                            <h3 class="font-bold text-xl mb-3">Ley de Pascal</h3>
+                            <p class="text-slate-700 italic border-l-4 border-slate-300 pl-4 py-2 bg-slate-50">
+                                "La presión en un punto de un fluido en reposo es la misma en todas las direcciones."
+                            </p>
+                            <p class="text-sm mt-2 text-slate-500">
+                                Esto significa que si consideramos un punto infinitesimal dentro de un fluido, la presión actúa con igual magnitud en todas direcciones, principio fundamental para el funcionamiento de dispositivos hidráulicos como el gato mostrado en la imagen.
+                            </p>
+                        </div>
+                    </div>
+                    <!-- IMAGEN: Gato Hidráulico -->
+                    <div class="flex flex-col items-center">
+                        <div class="img-hover-zoom shadow-lg rounded-lg border border-slate-200">
+                            <img src="https://github.com/Juansanher25/presionhidrostatica/blob/main/Gato%20hidr%C3%A1ulico.jpg?raw=true" alt="Principio de Pascal - Gato Hidráulico" class="w-full h-auto object-cover">
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2 italic">Fig 1. Aplicación del Principio de Pascal en un gato hidráulico.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. SECCIÓN TEORÍA -->
+        <div id="teoria" class="tab-content">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-12">
+                
+                <!-- Subsección 1 -->
+                <section>
+                    <h2 class="text-3xl font-bold text-blue-900 mb-6">Relación Presión-Elevación</h2>
+                    <p class="mb-4 text-slate-700">
+                        Como se detalla en la Guía 4, la presión en un fluido aumenta linealmente con la profundidad debido al peso de las capas superiores del fluido. La ecuación fundamental de la hidrostática es:
+                    </p>
+                    <div class="math-box text-center text-xl">
+                        $$ \Delta P = \gamma \cdot h $$
+                        $$ P_2 = P_1 + \gamma h $$
+                    </div>
+                    <p class="text-sm text-center text-slate-500">
+                        Donde $\gamma$ es el peso específico del fluido y $h$ es la profundidad vertical.
+                    </p>
+                </section>
+
+                <hr class="border-slate-200">
+
+                <!-- Subsección 2: Diagrama -->
+                <section class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Manometría</h3>
+                        <p class="text-slate-700 mb-4">
+                            El manómetro de tubo en U es una aplicación directa de la ecuación fundamental. Para resolver estos sistemas, Mott sugiere la técnica de "recorrido del manómetro":
+                        </p>
+                        <ol class="list-decimal pl-5 space-y-2 text-slate-700">
+                            <li>Comenzar en un punto de presión conocida.</li>
+                            <li>Sumar términos ($\gamma h$) si bajamos por el fluido.</li>
+                            <li>Restar términos ($\gamma h$) si subimos por el fluido.</li>
+                            <li>Igualar a la presión en el punto final.</li>
+                        </ol>
+                    </div>
+                    <div class="flex justify-center">
+                        <!-- SVG Diagrama Manómetro -->
+                        <svg width="250" height="300" viewBox="0 0 200 250" class="bg-white rounded border shadow-sm">
+                            <path d="M 40 20 L 40 180 A 30 30 0 0 0 100 180 L 100 80" fill="none" stroke="#cbd5e1" stroke-width="20" stroke-linecap="round" />
+                            <path d="M 40 20 L 40 180 A 30 30 0 0 0 100 180 L 100 80" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round" />
+                            <path d="M 40 20 L 40 140" fill="none" stroke="#bae6fd" stroke-width="16" />
+                            <path d="M 40 140 L 40 180 A 30 30 0 0 0 100 180 L 100 80" fill="none" stroke="#94a3b8" stroke-width="16" />
+                            <text x="120" y="120" font-family="sans-serif" font-size="12" fill="#333">h (dif)</text>
+                            <text x="10" y="30" font-family="sans-serif" font-size="12" fill="#333" font-weight="bold">P1</text>
+                            <text x="115" y="75" font-family="sans-serif" font-size="12" fill="#333" font-weight="bold">Patm</text>
+                            <line x1="40" y1="140" x2="100" y2="140" stroke="#333" stroke-dasharray="4" />
+                        </svg>
+                    </div>
+                </section>
+
+                <hr class="border-slate-200">
+
+                <!-- Subsección 3: Presión Absoluta con Imagen -->
+                <section>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-6">Presión Absoluta vs Manométrica</h3>
+                    <div class="flex flex-col md:flex-row gap-8 items-start">
+                        <div class="md:w-1/2 space-y-4">
+                            <div class="p-4 border rounded bg-slate-50">
+                                <h4 class="font-bold text-blue-800">Presión Absoluta ($P_{abs}$)</h4>
+                                <p>Medida con respecto al vacío perfecto (cero absoluto). Siempre es positiva.</p>
+                                <p class="font-mono mt-2 text-blue-600">$$ P_{abs} = P_{man} + P_{atm} $$</p>
+                            </div>
+                            <div class="p-4 border rounded bg-slate-50">
+                                <h4 class="font-bold text-blue-800">Presión Manométrica ($P_{man}$)</h4>
+                                <p>Medida con respecto a la presión atmosférica local. Puede ser positiva o negativa (vacío).</p>
+                            </div>
+                        </div>
+                        <!-- IMAGEN: Diagrama Presiones -->
+                        <div class="md:w-1/2">
+                            <div class="img-hover-zoom shadow-md rounded-lg border border-slate-200">
+                                <img src="https://github.com/Juansanher25/presionhidrostatica/blob/main/Presiones.jpg?raw=true" alt="Gráfico comparativo de presiones absoluta y manométrica" class="w-full h-auto object-cover">
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2 italic text-center">Fig 2. Relación gráfica entre las escalas de medición de presión.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- 4. SECCIÓN APLICACIONES -->
+        <div id="aplicaciones" class="tab-content">
+            <h2 class="text-3xl font-bold text-blue-900 mb-8">Aplicaciones Industriales Reales</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                
+                <!-- Card 1: Prensa Hidráulica -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col">
+                    <div class="h-48 overflow-hidden bg-gray-100 relative">
+                        <img src="https://github.com/Juansanher25/presionhidrostatica/blob/main/Prensa_Hidra%C3%BAlica.JPG?raw=true" alt="Prensa Hidráulica" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-2 right-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-bold shadow-sm">Industria</span>
+                    </div>
+                    <div class="p-6 flex-grow">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Prensas Hidráulicas</h3>
+                        <p class="text-slate-600">Basadas en el principio de Pascal. Una pequeña fuerza aplicada en un área pequeña genera una gran presión que se transmite a un área mayor, produciendo una fuerza de salida enorme capaz de moldear metales.</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Medidor de Nivel -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col">
+                    <div class="h-48 overflow-hidden bg-gray-100 relative">
+                        <img src="https://github.com/Juansanher25/presionhidrostatica/blob/main/Medidor%20de%20nivel.jpg?raw=true" alt="Medidor de Nivel" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-2 right-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded font-bold shadow-sm">Instrumentación</span>
+                    </div>
+                    <div class="p-6 flex-grow">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Medición de Nivel en Tanques</h3>
+                        <p class="text-slate-600">En la industria se utilizan transmisores de presión diferencial en el fondo de los tanques. La presión medida es directamente proporcional a la altura del líquido ($h = P / \gamma$), permitiendo un control preciso del inventario.</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Presas y Compuertas -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col">
+                    <div class="h-48 overflow-hidden bg-gray-100 relative">
+                        <img src="https://github.com/Juansanher25/presionhidrostatica/blob/main/Iwabuchi_suimon_red.jpg?raw=true" alt="Compuerta de Presa" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-2 right-2 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded font-bold shadow-sm">Civil</span>
+                    </div>
+                    <div class="p-6 flex-grow">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Presas y Compuertas</h3>
+                        <p class="text-slate-600">El diseño de compuertas (como la Compuerta Roja de Iwabuchi) requiere calcular la fuerza hidrostática resultante y su centro de presión. La presión triangular carga más la parte inferior de la estructura.</p>
+                    </div>
+                </div>
+
+                <!-- Card 4: Barómetros -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col">
+                    <div class="h-48 overflow-hidden bg-gray-100 relative flex items-center justify-center p-4">
+                        <img src="https://github.com/Juansanher25/presionhidrostatica/blob/main/Barometer.svg.png?raw=true" alt="Barómetro de Torricelli" class="h-full w-auto hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-2 right-2 text-xs bg-red-100 text-red-800 px-2 py-1 rounded font-bold shadow-sm">Meteorología</span>
+                    </div>
+                    <div class="p-6 flex-grow">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Barómetros de Torricelli</h3>
+                        <p class="text-slate-600">Instrumento fundamental para medir la presión atmosférica local ($P_{atm}$). Utiliza una columna de mercurio invertida donde la altura de la columna equilibra el peso de la atmósfera.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 5. SECCIÓN EJEMPLOS (5 Numéricos) -->
+        <div id="ejemplos" class="tab-content">
+            <h2 class="text-3xl font-bold text-blue-900 mb-8">Ejemplos Numéricos Resueltos</h2>
+            
+            <div class="space-y-6">
+                <!-- Ejemplo 1 -->
+                <div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-100 px-6 py-4 border-b font-bold text-blue-900">Ejemplo 1: Presión Hidrostática Básica</div>
+                    <div class="p-6">
+                        <p class="mb-4"><strong>Problema:</strong> Calcule la presión en el fondo de un tanque que contiene aceite ($sg = 0.90$) con una profundidad de 3.0 metros.</p>
+                        <div class="bg-slate-50 p-4 rounded text-sm font-mono text-slate-700">
+                            <p>1. Peso específico del agua: $\gamma_w = 9.81 \text{ kN/m}^3$</p>
+                            <p>2. Peso específico aceite: $\gamma_o = 0.90 \times 9.81 = 8.829 \text{ kN/m}^3$</p>
+                            <p>3. Ecuación: $P = \gamma h$</p>
+                            <p>4. Cálculo: $P = 8.829 \text{ kN/m}^3 \times 3.0 \text{ m} = 26.49 \text{ kPa}$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ejemplo 2 -->
+                <div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-100 px-6 py-4 border-b font-bold text-blue-900">Ejemplo 2: Presión Absoluta</div>
+                    <div class="p-6">
+                        <p class="mb-4"><strong>Problema:</strong> Si la presión manométrica calculada en el Ejemplo 1 es 26.49 kPa y la presión atmosférica local es 95 kPa, ¿cuál es la presión absoluta?</p>
+                        <div class="bg-slate-50 p-4 rounded text-sm font-mono text-slate-700">
+                            <p>1. Fórmula: $P_{abs} = P_{man} + P_{atm}$</p>
+                            <p>2. Cálculo: $P_{abs} = 26.49 + 95$</p>
+                            <p>3. Resultado: $P_{abs} = 121.49 \text{ kPa (abs)}$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ejemplo 3 -->
+                <div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-100 px-6 py-4 border-b font-bold text-blue-900">Ejemplo 3: Carga de Presión (Head)</div>
+                    <div class="p-6">
+                        <p class="mb-4"><strong>Problema:</strong> ¿A qué altura de columna de agua equivale una presión de 50 psi?</p>
+                        <div class="bg-slate-50 p-4 rounded text-sm font-mono text-slate-700">
+                            <p>1. Conversión: $\gamma_w = 62.4 \text{ lb/ft}^3$</p>
+                            <p>2. Presión en psf: $50 \text{ lb/in}^2 \times 144 \text{ in}^2/\text{ft}^2 = 7200 \text{ lb/ft}^2$</p>
+                            <p>3. Despeje h: $h = P / \gamma$</p>
+                            <p>4. Cálculo: $h = 7200 / 62.4 = 115.38 \text{ ft}$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ejemplo 4 -->
+                <div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-100 px-6 py-4 border-b font-bold text-blue-900">Ejemplo 4: Manómetro Diferencial</div>
+                    <div class="p-6">
+                        <p class="mb-4"><strong>Problema:</strong> Un manómetro de mercurio ($sg=13.54$) muestra una deflexión de 0.2 m. El fluido en la tubería es agua. Calcule la diferencia de presión.</p>
+                        <div class="bg-slate-50 p-4 rounded text-sm font-mono text-slate-700">
+                            <p>1. Ecuación: $\Delta P = (\gamma_m - \gamma_w)h$</p>
+                            <p>2. $\gamma_m = 13.54 \times 9.81 = 132.83 \text{ kN/m}^3$</p>
+                            <p>3. Cálculo: $\Delta P = (132.83 - 9.81) \times 0.2$</p>
+                            <p>4. Resultado: $\Delta P = 24.6 \text{ kPa}$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ejemplo 5 -->
+                <div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-100 px-6 py-4 border-b font-bold text-blue-900">Ejemplo 5: Tanque Cerrado</div>
+                    <div class="p-6">
+                        <p class="mb-4"><strong>Problema:</strong> Un tanque cerrado tiene aire a 10 kPa sobre 2 m de agua. ¿Presión en el fondo?</p>
+                        <div class="bg-slate-50 p-4 rounded text-sm font-mono text-slate-700">
+                            <p>1. $P_{fondo} = P_{aire} + \gamma_{agua}h$</p>
+                            <p>2. $P_{fondo} = 10 \text{ kPa} + (9.81 \times 2)$</p>
+                            <p>3. Resultado: $P_{fondo} = 29.62 \text{ kPa}$</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. SECCIÓN EJERCICIOS (5 Propuestos) -->
+        <div id="ejercicios" class="tab-content">
+            <h2 class="text-3xl font-bold text-blue-900 mb-8">Banco de Ejercicios Propuestos</h2>
+            <div class="bg-indigo-900 text-white p-6 rounded-xl mb-8">
+                <p><strong>Instrucciones:</strong> Resuelva los siguientes ejercicios en su cuaderno de apuntes. Utilice los apéndices del libro de Mott para buscar las propiedades de los fluidos a temperatura ambiente.</p>
+            </div>
+            
+            <ul class="space-y-4">
+                <li class="bg-white p-6 rounded shadow-sm border-l-4 border-indigo-500 flex gap-4">
+                    <div class="font-bold text-2xl text-indigo-200">01</div>
+                    <div>
+                        <p class="font-bold">Profundidad Oceánica</p>
+                        <p>Si la presión en cierto punto del océano es de 145 psi (manométrica), determine la profundidad en pies. Asuma que el agua de mar tiene una gravedad específica de 1.03.</p>
+                    </div>
+                </li>
+                <li class="bg-white p-6 rounded shadow-sm border-l-4 border-indigo-500 flex gap-4">
+                    <div class="font-bold text-2xl text-indigo-200">02</div>
+                    <div>
+                        <p class="font-bold">Manómetro Inclinado</p>
+                        <p>Un manómetro inclinado tiene un ángulo de 30° respecto a la horizontal. Si la longitud de la columna de fluido ($sg=0.8$) es de 15 cm, ¿cuál es la presión en el tanque conectado?</p>
+                    </div>
+                </li>
+                <li class="bg-white p-6 rounded shadow-sm border-l-4 border-indigo-500 flex gap-4">
+                    <div class="font-bold text-2xl text-indigo-200">03</div>
+                    <div>
+                        <p class="font-bold">Presión de Vacío</p>
+                        <p>Un vacuómetro marca -25 kPa. Si la presión atmosférica es de 100 kPa, exprese la presión absoluta en kPa y en mmHg.</p>
+                    </div>
+                </li>
+                <li class="bg-white p-6 rounded shadow-sm border-l-4 border-indigo-500 flex gap-4">
+                    <div class="font-bold text-2xl text-indigo-200">04</div>
+                    <div>
+                        <p class="font-bold">Fuerza en una Portilla</p>
+                        <p>Una ventana circular de 30 cm de diámetro en un submarino está sometida a una presión de agua de mar a 50 m de profundidad. Calcule la fuerza total sobre el vidrio.</p>
+                    </div>
+                </li>
+                <li class="bg-white p-6 rounded shadow-sm border-l-4 border-indigo-500 flex gap-4">
+                    <div class="font-bold text-2xl text-indigo-200">05</div>
+                    <div>
+                        <p class="font-bold">Sistema Multifuido</p>
+                        <p>Un tanque contiene (de abajo hacia arriba): mercurio (10 cm), agua (50 cm) y aceite (sg=0.8, 40 cm). Calcule la presión manométrica en el fondo del tanque.</p>
+                    </div>
+                </li>
+
+                <!-- NUEVO EJERCICIO 6: Preguntas 9 y 10 con Gráfica SVG -->
+                <li class="bg-white p-6 rounded shadow-sm border-l-4 border-indigo-500 flex flex-col gap-4">
+                    <div class="flex gap-4">
+                        <div class="font-bold text-2xl text-indigo-200">06</div>
+                        <div>
+                            <p class="font-bold text-lg mb-2">Ejercicio de Análisis Gráfico</p>
+                            <p class="mb-4">Observe el siguiente esquema de un manómetro diferencial que conecta las tuberías A y B (ambas conducen agua). El fluido manométrico es mercurio ($sg=13.54$). La deflexión del mercurio es de 20 cm.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- SVG Diagrama Manómetro Diferencial -->
+                    <div class="flex justify-center my-4 bg-slate-50 border rounded p-8">
+                        <svg width="400" height="250" viewBox="0 0 400 250">
+                            <!-- Defs for arrows -->
+                            <defs>
+                                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                                </marker>
+                            </defs>
+
+                            <!-- Pipe A (Left) -->
+                            <circle cx="80" cy="50" r="20" fill="#e2e8f0" stroke="#334155" stroke-width="3"/>
+                            <text x="73" y="55" font-family="sans-serif" font-weight="bold" fill="#334155">A</text>
+                            
+                            <!-- Pipe B (Right) -->
+                            <circle cx="320" cy="50" r="20" fill="#e2e8f0" stroke="#334155" stroke-width="3"/>
+                            <text x="313" y="55" font-family="sans-serif" font-weight="bold" fill="#334155">B</text>
+
+                            <!-- Connecting Tubes (Water) -->
+                            <!-- Tube from A going down -->
+                            <path d="M 80 70 L 80 150" fill="none" stroke="#bae6fd" stroke-width="40" />
+                            <!-- Tube from B going down -->
+                            <path d="M 320 70 L 320 110" fill="none" stroke="#bae6fd" stroke-width="40" />
+
+                            <!-- U-Tube Mercury -->
+                            <!-- Mercury is lower on Left (pressed by A) and higher on Right (B) implies Pa > Pb? 
+                                 Let's make Mercury higher on Right side to allow Pa > Pb flow analysis.
+                                 Left Interface: y=150
+                                 Right Interface: y=110
+                                 Mercury connects bottom loop.
+                            -->
+                            <path d="M 80 150 L 80 200 A 120 120 0 0 0 320 200 L 320 110" fill="none" stroke="#94a3b8" stroke-width="40" stroke-linecap="butt" />
+
+                            <!-- Tube Outline -->
+                            <!-- Recalculated for width 40 (Radius 20) -->
+                            <!-- Left Tube: Center 80. Walls at 60 and 100 -->
+                            <path d="M 60 70 L 60 200" fill="none" stroke="#64748b" stroke-width="2" />
+                            <path d="M 100 70 L 100 200" fill="none" stroke="#64748b" stroke-width="2" />
+                            
+                            <!-- Right Tube: Center 320. Walls at 300 and 340 -->
+                            <path d="M 300 70 L 300 200" fill="none" stroke="#64748b" stroke-width="2" />
+                            <path d="M 340 70 L 340 200" fill="none" stroke="#64748b" stroke-width="2" />
+                            
+                            <!-- Bottom Arcs -->
+                            <!-- Outer Arc: Connects 60 to 340. Center 200, 200? No.
+                                 The center of the U-turn is at midpoint x=200.
+                                 The fluid arc center is x=200, y=200 with radius 120.
+                                 So fluid goes from 80 to 320.
+                                 Outer wall radius = 120 + 20 = 140.
+                                 Inner wall radius = 120 - 20 = 100.
+                            -->
+                            <path d="M 60 200 A 140 140 0 0 0 340 200" fill="none" stroke="#64748b" stroke-width="2" />
+                            <path d="M 100 200 A 100 100 0 0 0 300 200" fill="none" stroke="#64748b" stroke-width="2" />
+
+                            <!-- Interfaces Lines (Width 40: x +/- 20) -->
+                            <line x1="60" y1="150" x2="100" y2="150" stroke="#333" stroke-width="1" />
+                            <line x1="300" y1="110" x2="340" y2="110" stroke="#333" stroke-width="1" />
+
+                            <!-- Dimension Line for Delta h -->
+                            <!-- Moved to x=360 to clear the tube (wall at 340) -->
+                            <line x1="360" y1="110" x2="360" y2="150" stroke="#333" stroke-width="1" marker-start="url(#arrowhead)" marker-end="url(#arrowhead)" />
+                            <!-- Custom arrow heads manually if marker fails in basic viewer -->
+                            <path d="M 357 115 L 360 110 L 363 115" fill="none" stroke="#333" /> 
+                            <path d="M 357 145 L 360 150 L 363 145" fill="none" stroke="#333" />
+                            
+                            <text x="370" y="135" font-family="sans-serif" font-size="12">20 cm</text>
+
+                            <!-- Labels -->
+                            <text x="95" y="155" font-family="sans-serif" font-size="10" fill="#666">Agua/Hg</text>
+                            <text x="260" y="115" font-family="sans-serif" font-size="10" fill="#666">Agua/Hg</text>
+                        </svg>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="p-3 bg-slate-50 rounded">
+                            <p class="font-bold">¿Cuánto vale la diferencia de presiones manométricas entre A y B? Exprese la respuesta en kPa.</p>
+                            <p class="text-sm text-slate-500 mt-1 italic">Tip: Plantee la ecuación manométrica desde A hasta B y despeje la diferencia.</p>
+                        </div>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <!-- 7. SECCIÓN BIBLIOGRAFÍA -->
+        <div id="bibliografia" class="tab-content">
+            <h2 class="text-3xl font-bold text-blue-900 mb-8">Bibliografía y Referencias</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 divide-y">
+                <div class="p-6">
+                    <p class="font-bold text-lg">Mott, R. L., & Untener, J. A. (2015).</p>
+                    <p class="italic">Mecánica de Fluidos (7ª ed.).</p>
+                    <p class="text-slate-600">Pearson Educación. (Capítulo 3: Medición de la presión).</p>
+                </div>
+                <div class="p-6">
+                    <p class="font-bold text-lg">Sandoval Herrera, J. A. (2018).</p>
+                    <p class="italic">Guías de Clase: Mecánica de Fluidos.</p>
+                    <p class="text-slate-600">Fundación Universidad de América. (Guía 4: Estática de Fluidos).</p>
+                </div>
+                <div class="p-6">
+                    <p class="font-bold text-lg">Recursos Adicionales</p>
+                    <p class="text-slate-600">Apuntes de clase, Facultad de Ingeniería, Universidad de América, Bogotá.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="bg-slate-800 text-slate-400 py-8 mt-auto">
+        <div class="container mx-auto text-center px-4">
+            <p>&copy; 2024 Fundación Universidad de América. Todos los derechos reservados.</p>
+            <p class="text-xs mt-2">Módulo desarrollado con fines educativos para el curso de Mecánica de Fluidos.</p>
+        </div>
+    </footer>
+
+    <!-- SCRIPT DE NAVEGACIÓN (JAVASCRIPT) -->
+    <script>
+        function openTab(tabName) {
+            // 1. Ocultar todos los contenidos
+            var contents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].classList.remove("active");
+            }
+
+            // 2. Desactivar todos los botones
+            var buttons = document.getElementsByClassName("nav-btn");
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+            }
+
+            // 3. Mostrar el contenido seleccionado y activar botón
+            document.getElementById(tabName).classList.add("active");
+            
+            // Encontrar el botón que llamó a esta función
+            for (var i = 0; i < buttons.length; i++) {
+                if(buttons[i].getAttribute('onclick').includes(tabName)) {
+                    buttons[i].classList.add("active");
+                }
+            }
+        }
+    </script>
+</body>
+</html>
